@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="hello">Hello World, Convert!</string>
+	<string name="app_name">Lambad</string>
+	<color name="myColor">#3399CC</color>
+	<string name="myClickHandler">myClickHandler</string>
+	<string name="calc">Evaluate</string>
+</resources>

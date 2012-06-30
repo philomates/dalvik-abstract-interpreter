@@ -1,0 +1,19 @@
+Simple lambda calc evaluator
+need to do parsing...
+
+
+Registering/Building from the commandline:
+  Register the app with the sdk:
+    Find the target you want to use
+    $ android list targets
+
+    In the project dir run the following with the appropriate target
+    $ android update project --path . --target 1
+
+    This should create a build.xml file
+
+  Build the app:
+    $ ant debug
+
+Run dedexer and convert to sexpr:
+  $ sh ../../bin/project2sexpr

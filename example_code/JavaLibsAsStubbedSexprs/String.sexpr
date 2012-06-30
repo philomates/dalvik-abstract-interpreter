@@ -1,0 +1,45 @@
+(class (attrs) java/lang/String
+ (super java/lang/Object)
+ (source "String.java")
+
+(method (attrs public) <init>()void
+  (limit registers 1)
+  (return-void)
+)
+
+(method (attrs public) substring(int int)[object java/lang/String]
+  (limit registers 5)
+  ; return "this"
+  (return-object v2)
+)
+
+(method (attrs public) length()int
+  (limit registers 3)
+  (const/4 v0 0)
+  (return v0)
+)
+
+(method (attrs public) length(int)int
+  (limit registers 3)
+  (const/4 v0 0)
+  (return v0)
+)
+
+(method (attrs public) indexOf(int)int
+  (limit registers 3)
+  (const/4 v0 0)
+  (return v0)
+)
+
+(method (attrs public) substring(int)[object java/lang/String]
+  (limit registers 4)
+  ; return "this"
+  (return-object v2)
+)
+
+(method (attrs public) equals([object java/lang/Object])boolean
+  (limit registers 3)
+  (const/4 v0 0)
+  (return v0)
+)
+)

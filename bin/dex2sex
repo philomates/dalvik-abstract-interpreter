@@ -1,0 +1,241 @@
+#!/bin/sed -f
+# or on mac: !/opt/local/bin/gsed -f 
+
+# Strip all comments
+# /;[^"]*$/ {
+#  s/;[^"]*$//g;
+#}
+
+# Strip comments off fields
+s/^\.field\(.*\);\([^"]*\)$/.field\1;/
+
+# Turn signature types into something sensible:
+/^[^"]*(.*)/ {
+   s/(\(.*\))/(type:\1)type:/
+}
+
+/^\.annotation/ {
+  s/runtimeVisibility /&type:/
+}
+
+/^\.annotation/ {
+  s/systemVisibility /&type:/
+}
+
+/^\.throws/ {
+  s/^\.throws \(.*\)$/.throws type:\1/
+}
+
+# turn: .var 3 is urlConnection Ljava/net/URLConnection; from l16a0 to l16d8
+# into: .var v3 urlConnection type:Ljava/net/URLConnection; l16a0 l16d8
+/^\.var/ {
+  s/^\.var \([0-9]\+\) is \([A-Za-z_0-9]\+\) \([^ ]\+\) from \([A-Za-z0-9]\+\) to \([A-Za-z0-9]\+\)/.var v\1 \2 type:\3 \4 \5/
+}
+
+/^\.field.*=.*$/ {
+  # TODO: remove the need for explicit int/string matches
+  # match int (has ; near end of line)
+  s/\([^ ]\+\) = \(.*\)\t;/type:\1 = \2/
+  t wasint
+  # match string (has no ;)
+  s/\([^ ]\+\) = \(.*\)/type:\1 = \2/
+}
+: wasint
+
+/^\.field[^=]*$/ {
+  s/[^ ]\+$/type:&/
+}
+
+/^\t[is]\(get\|put\)/ {
+  s/[^ ]\+$/type:&/
+}
+
+/^\tcheck-cast/ {
+  # check-cast doesn't use primitive types,
+  # but also doesn't use 'L' to denote objects.
+  # If the type isn't an array,
+  # add 'L' to the type so that it can be properly processed.
+  s/[^ \t,]\+$/type:&;/
+  # skip adding 'L' if it is an array (XXX: untested)
+  /[^[]*\[/ b skip-check-cast
+  # add in L because the type should only be an object
+  s/type:\([^ \t,]\+$\)/type:L\1/
+  : skip-check-cast
+}
+/^\t\(filled-new-array\|new-array\)/ {
+  s/[^ \t,]\+$/type:&/
+}
+
+
+/^[^"]*type:/ {
+  : top
+  s/type:\[\[I/[array [array int]] type:/
+  s/type:\[I/[array int] type:/
+  s/type:\[D/[array double] type:/
+  s/type:\[L\([^;]*\);/[array [object \1]] type:/
+  s/type:L\([^;]*\);/[object \1] type:/
+  s/type:Z/boolean type:/
+  s/type:C/char type:/
+  s/type:B/byte type:/
+  s/type:S/short type:/
+  s/type:F/float type:/
+  s/type:D/double type:/
+  s/type:I/int type:/
+  s/type:J/long type:/
+  s/type:V/void type:/
+  s/ type:)/)/
+  s/type: //
+  s/type:)/)/
+  s/type:$//
+  t top
+}
+
+## Attributes:
+/^\(\.method\|\.class\|\.interface\|\.field\)/ {
+  s/\([ ]\?\(public\|protected\|private\|static\|final\|abstract\)\)\+/ (attrs&)/
+  s/^\.class \([[:alnum:]_$\/]\+\)$/.class (attrs) \1/
+  s/^\.method \([[:alnum:]_<>]\+\)(/.method (attrs) \1(/
+}
+
+
+
+## Classes and Interfaces:
+/^\.class/  s/\.class/(class/
+/^\.interface/  s/\.interface/(interface/
+
+
+
+# Close off the class at the end:
+$ s/.*/)/ 
+
+/^\.implements/ {
+  s/\.implements/ (implements /
+  s/$/)/
+}
+
+/^\.super/ { 
+  s/\.super/ (super/
+  s/$/)/
+}
+
+/^\.source/ {
+  s/\.source / (source "/
+  s/$/")/
+}
+
+/^\.inner/ {
+  s/\.inner / (inner /
+  s/$/)/
+}
+
+/^\.field/ {
+  s/\.field/ (field /
+  s/$/)/
+}
+
+/^\.var/ {
+  s/\.var/  (var/
+  s/$/)/
+}
+
+/^\.enclosing/ {
+  s/^\.enclosing/ (enclosing/
+  s/$/)/
+}
+
+
+## Methods:
+/^\.method/ {
+  s/\.method/(method/
+}
+
+/^\.limit registers/ {
+  s/\.limit/  (limit/
+  s/$/)/
+}
+
+/^\.line/ {
+  s/^\.line/  (line/
+  s/$/)/
+}
+
+/^\.throws/ {
+  s/^\.throws/  (throws/
+  s/[ ]*$/)/
+}
+
+/^\.catch/ {
+  s/^\.catch/  (catch/
+  s/$/)/
+}
+
+# inline case labels in packed-switch, where default is the last label
+/^\tpacked-switch/ {
+  :a
+  /[^default]$/ {
+    N
+    s/\n//
+    s/\t\t/\t/
+    s/\([[:alnum:]_]\+\)\t; \(.*\)$/\1/
+    s/default: \([[:alnum:]_]\+\)/\1/
+    b a
+  }
+}
+
+# put labels and data-array on seperate lines (???)
+# TODO: what are data-arrays?
+s/^\([[:alnum:]_]\+:\)\t\(data-array\)$/\1\n  (\2)/
+
+## Remove "end field", for the case where there are annotaitons inside a field:
+/^\.end field/ {
+  s/.*//
+}
+
+## Remove annotations:
+/[ ]*.annotation/,/]*.end annotation/d
+
+## Annotations (if they weren't removed):
+/^\.annotation/ {
+  s/\.annotation/ (annotation/
+}
+
+/^\.end annotation/ {
+  s/.*/  )/
+}
+
+## Add in type info to invoke-* statements:
+/^\tinvoke-[[:alnum:]]\+/ {
+  s/\t; [<>[:alnum:]]\+(\([^)]*\))/ \1\t; /
+}
+
+
+# Promote labels:
+s/^\([[:alnum:]_]\+\):/  (label \1)/
+
+# Indent comments:
+s/^;/  ;/
+
+# Turn {vN..vM} into {vN vM} in ranged args
+/range/ {
+  s/\(v[0-9]\+\)..\(v[0-9]\+\)/\1 \2/
+}
+
+
+# Wrap bytecodes:
+/^\t/ {
+  s/,/ /g
+  s/^\t/  (/
+  t next
+  : next
+  s/;\t/)&/
+  s/\t;/)&/
+  t skip
+  s/[ \t]*$/)/
+  : skip
+  s/\t/ /g
+}
+
+/^\.end method/ {
+  s/.*/)/
+}
+

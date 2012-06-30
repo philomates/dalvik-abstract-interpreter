@@ -1,0 +1,9 @@
+(class (attrs) java/lang/Error
+ (super java/lang/Object)
+ (source "Error.java")
+
+(method (attrs public) <init>([object java/lang/String])void
+  (limit registers 2)
+  (return-void)
+)
+)

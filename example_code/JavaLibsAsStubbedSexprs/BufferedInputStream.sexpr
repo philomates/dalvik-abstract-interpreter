@@ -1,0 +1,9 @@
+(class (attrs) java/io/BufferedInputStream
+ (super java/io/InputStream)
+ (source "BufferedInputStream.java")
+
+(method (attrs public) <init>([object java/io/BufferedInputStream])void
+  (limit registers 1)
+  (return-void)
+)
+)

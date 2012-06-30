@@ -1,0 +1,16 @@
+(class (attrs) java/net/URLConnection
+ (super java/lang/Object)
+ (source "URLConnection.java")
+
+(method (attrs public) <init>()void
+  (limit registers 1)
+  (return-void)
+)
+
+(method (attrs public) getInputStream()void
+  (limit registers 2)
+  (new-instance v0 java/io/InputStream)
+  (invoke-direct {v0} java/io/InputStream/<init>) ; void
+  (return v0)
+)
+)

@@ -1,0 +1,20 @@
+(class (attrs) java/math/BigInteger
+ (super java/lang/Object)
+ (source "BigInteger.java")
+
+(method (attrs public) <init>()void
+  (limit registers 1)
+  (return-void)
+)
+
+(method (attrs public) <init>([object java/lang/String])void
+  (limit registers 2)
+  (return-void)
+)
+
+(method (attrs public) toString()[object java/lang/String]
+  (limit registers 2)
+  (const-string v0 "")
+  (return v0)
+)
+)

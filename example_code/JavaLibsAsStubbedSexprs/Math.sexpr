@@ -1,0 +1,28 @@
+(class (attrs) java/lang/Math
+ (super java/lang/Object)
+ (source "Math.java")
+
+(method (attrs public static) min(int int)int 
+  (limit registers 2)
+  ; parameter[0] : v0 (int)
+  ; parameter[1] : v1 (int)
+  (if-ge v0 v1 lfd6)
+  (label lfd4)
+  (return v0)
+  (label lfd6)
+  (move v0 v1)
+  (goto lfd4)
+)
+
+(method (attrs public static) max(int int)int 
+  (limit registers 2)
+  ; parameter[0] : v0 (int)
+  ; parameter[1] : v1 (int)
+  (if-le v0 v1 lfba)
+  (label lfb8)
+  (return v0)
+  (label lfba)
+  (move v0 v1)
+  (goto lfb8)
+)
+)

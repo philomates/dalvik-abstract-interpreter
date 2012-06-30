@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# ddx1.18.jar was created by:
+# Gabor Paller
+# http://pallergabor.uw.hu
+
+# shourtcut for dedexer tool
+DIR="$( cd "$( dirname "$0" )" && pwd )"
+java -jar $DIR"/"ddx1.18.jar $@

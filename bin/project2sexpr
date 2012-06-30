@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Usage: run on android project root, where bin/classes.dex is available.
+# This will dedex the classes.dex and run it through dex2sex storing the
+# results in $OUT
+
+OUT="dedexOut"
+
+# grab dir that contains this script
+DIR="$( cd "$( dirname "$0" )" && pwd )"
+
+if [ ! -e "bin/classes.dex" ]; then
+  echo "bin/classes.dex doesn't exists in "`pwd`
+  exit;
+fi
+
+# create out dir if it doesn't exist
+if [ ! -d "$OUT" ]; then
+  echo "creating "$OUT" directory\n"
+  mkdir $OUT
+fi
+
+# run dedexer
+echo -e "running dedexer:"
+sh $DIR"/"ddx -d $OUT bin/classes.dex
+
+# run dex2sex and store results in $OUT with .sexpr extension
+echo -e "\nrunning dex2sex"
+for f in `find $OUT | grep "\.ddx$"`;
+  do $DIR"/"../dex2sex $f > `echo $f | awk -F "." '{print $1}'`".sexpr";
+done
+
+# copy in sexpr-ified stubbed java libs
+echo -e "\ncopying over stubbed out java libraries"
+if [ -d "../JavaLibsAsStubbedSexprs" ]; then
+  SUB=$(find . -type f -name "*.sexpr" | head -1 | sed 's/[^/]*$//')
+  cp ../JavaLibsAsStubbedSexprs/*.sexpr $SUB
+fi
+
+echo -e "\nSuccess!"

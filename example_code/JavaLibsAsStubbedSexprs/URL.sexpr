@@ -1,0 +1,21 @@
+(class (attrs) java/net/URL
+ (super java/lang/Object)
+ (source "URL.java")
+
+(method (attrs public) <init>()void
+  (limit registers 1)
+  (return-void)
+)
+
+(method (attrs public) <init>([object java/lang/String])void
+  (limit registers 2)
+  (return-void)
+)
+
+(method (attrs public) openConnection()[object java/net/URLConnection]
+  (limit registers 2)
+  (new-instance v1 java/net/URLConnection)
+  (invoke-direct {v1} java/net/URLConnection/<init>) ; void
+  (return v1)
+)
+)
