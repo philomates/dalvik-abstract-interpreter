@@ -27,7 +27,7 @@ sh $DIR"/"ddx -d $OUT bin/classes.dex
 # run dex2sex and store results in $OUT with .sexpr extension
 echo -e "\nrunning dex2sex"
 for f in `find $OUT | grep "\.ddx$"`;
-  do $DIR"/"../dex2sex $f > `echo $f | awk -F "." '{print $1}'`".sexpr";
+  do $DIR"/"dex2sex $f > `echo $f | awk -F "." '{print $1}'`".sexpr";
 done
 
 # copy in sexpr-ified stubbed java libs
